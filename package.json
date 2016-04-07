@@ -1,0 +1,39 @@
+{
+  "name": "cpr-server",
+  "version": "1.0.0",
+  "description": "Car Plate Reader Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vilnius/cpr-server.git"
+  },
+  "author": "Code 4 Vilnius",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vilnius/cpr-server/issues"
+  },
+  "homepage": "https://github.com/vilnius/cpr-server#readme",
+  "dependencies": {
+    "babel-preset-es2015": "^6.5.0",
+    "babel-register": "^6.5.2",
+    "body-parser": "^1.15.0",
+    "cors": "^2.7.1",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "jade": "^1.11.0",
+    "mongoose": "^4.4.7",
+    "morgan": "^1.7.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.0.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  }
+}

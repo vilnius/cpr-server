@@ -1,0 +1,1 @@
+export const SECRET = 's3cr3t';
