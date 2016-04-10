@@ -4,7 +4,8 @@ var Schema = mongoose.Schema;
 var Lanemap = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   geoJSON: {
     type: Schema.Types.Mixed,

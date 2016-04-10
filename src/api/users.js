@@ -1,4 +1,6 @@
 import { Router } from 'express';
+
+import { isAuthenticated } from '../helpers';
 import { User } from '../models';
 
 export default function() {

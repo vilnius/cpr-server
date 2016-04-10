@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { Lanemap } from '../models';
 import passport from 'passport';
 
 import { isAuthenticated } from '../helpers';
+import { Lanemap } from '../models';
 
 export default function() {
   var router = Router();

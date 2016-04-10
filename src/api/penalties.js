@@ -1,22 +1,22 @@
 import { Router } from 'express';
 
 import { isAuthenticated } from '../helpers';
-import { Lanemap } from '../models';
+import { Penalty } from '../models';
 
 export default function() {
   var api = Router();
 
   api.get('/', (req, res) => {
-    Lanemap.find({}, (err, data) => {
+    Penalty.find({}, (err, data) => {
       if (err) throw err;
       res.json(data);
     });
   });
 
-  api.post('/', (req, res) => {
-    var lanemap = new Lanemap(req.body);
+  api.post('/', isAuthenticated, (req, res) => {
+    var penalty = new Penalty(req.body);
 
-    lanemap.save((err, data) => {
+    penalty.save((err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
@@ -27,7 +27,7 @@ export default function() {
   api.get('/:id', (req, res) => {
     var id = req.params.id;
 
-    Lanemap.findById(id, (err, data) => {
+    Penalty.findById(id, (err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
@@ -39,10 +39,10 @@ export default function() {
 
   });
 
-  api.post('/:id', (req, res) => {
+  api.post('/:id', isAuthenticated, (req, res) => {
     var id = req.params.id;
 
-    Lanemap.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {
+    Penalty.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
