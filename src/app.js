@@ -54,7 +54,7 @@ db(() => {
   // api router
   app.use('/api', api());
   // static files
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.static(config.STATIC_ROOT));
   // redirect all to index
   app.get('*', function (req, res) {
     res.sendFile('index.html', {
