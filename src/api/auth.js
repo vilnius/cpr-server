@@ -8,7 +8,7 @@ export default function() {
   var router = Router();
 
   router.post('/login', passport.authenticate('local'), function(req, res, next) {
-    res.send({message: 'Login successful'});
+    res.send({message: 'Login successful', token: 'abrakadabra'});
   });
 
   router.post('/logout', isAuthenticated, function(req, res, next) {
