@@ -23,8 +23,8 @@ function generateRandomPenalty(imageId) {
         image: imageId,
         plate: randomPlate(),
         gps: {
-            lat: random(54.2, 54.9),
-            lon: random(25.0, 25.5)
+            lat: random(54.39, 54.44),
+            lon: random(25.11, 25.19)
         },
         plates: [
             { plate: randomPlate(), probability: Math.random() }

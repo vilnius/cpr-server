@@ -32,8 +32,12 @@ export default function() {
       res.status(400).json({ error: "Bad file ID" });
     }
 
-    var filePath = path.join(UPLOAD_PATH, req.params.id)
-    var stat = fs.statSync(filePath);
+    var filePath = path.join(UPLOAD_PATH, req.params.id);
+    try {
+      var stat = fs.statSync(filePath);
+    } catch(e) {
+      res.status(404).json({ error: "File not found" });
+    }
     res.writeHead(200, {
         'Content-Type': mime.lookup(filePath),
         'Content-Length': stat.size
