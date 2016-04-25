@@ -6,7 +6,7 @@ import { Penalty } from '../models';
 export default function() {
   var api = Router();
 
-  api.get('/', (req, res) => {
+  api.get('/', isAuthenticated, (req, res) => {
     Penalty.find({}, (err, data) => {
       if (err) throw err;
       res.json(data);
@@ -24,7 +24,7 @@ export default function() {
     });
   });
 
-  api.get('/:id', (req, res) => {
+  api.get('/:id', isAuthenticated, (req, res) => {
     var id = req.params.id;
 
     Penalty.findById(id, (err, data) => {

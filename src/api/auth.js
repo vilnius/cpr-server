@@ -11,7 +11,7 @@ export default function() {
     res.send({message: 'Login successful', token: 'abrakadabra'});
   });
 
-  router.post('/logout', isAuthenticated, function(req, res, next) {
+  router.post('/logout', function(req, res, next) {
     req.logout();
     res.send({message: 'Logout successful'});
   });

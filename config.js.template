@@ -2,3 +2,4 @@ import path from 'path';
 
 export const SECRET = 's3cr3t';
 export const STATIC_ROOT = path.join(__dirname, 'src', 'public');
+export const UPLOAD_PATH = './uploads/';
