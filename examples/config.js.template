@@ -1,0 +1,10 @@
+var URL = "http://localhost:3000";
+
+module.exports = {
+    FILENAME: "1.png",
+    USERNAME: "admin",
+    PASSWORD: "admin",
+    LOGIN: URL + "/api/auth/login",
+    IMAGES: URL + "/api/images",
+    PENALTIES: URL + "/api/penalties"
+};
