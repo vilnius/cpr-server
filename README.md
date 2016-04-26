@@ -5,6 +5,7 @@ API backend of CPR application, also serves frontend single page application.
 ## Requirements
 
 Built using node.js, express, passport, mongoose (MongoDB).
+Dev server runs on nodemon, to install it: `sudo npm install nodemon -g`.
 
 ## Running
 

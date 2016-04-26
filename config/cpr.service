@@ -1,0 +1,12 @@
+[Service]
+ExecStart=/usr/bin/node /home/cpr/cpr-server/server.js
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=cpr-server
+User=cpr
+Group=cpr
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

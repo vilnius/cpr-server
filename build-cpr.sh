@@ -3,7 +3,7 @@
 # A script for building/updating frontend and backend
 #
 # ROOT = directory of this bash file
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 #
 # CPR Frontend
 cd $ROOT/cpr-frontend
@@ -12,7 +12,6 @@ git pull
 echo "- Installing npm dependencies..."
 npm install
 echo "- Building frontend..."
-npm run prebuild:prod
 npm run build:prod
 #
 # CPR Server
