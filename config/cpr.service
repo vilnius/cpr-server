@@ -6,7 +6,7 @@ StandardError=syslog
 SyslogIdentifier=cpr-server
 User=cpr
 Group=cpr
-Environment=NODE_ENV=production
+Environment=NODE_ENV=production HOST=127.0.0.1 PORT=2370
 
 [Install]
 WantedBy=multi-user.target
