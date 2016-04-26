@@ -26,7 +26,7 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json({
-  limit : '1000kb'
+  limit : '5000kb'
 }));
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -61,8 +61,9 @@ db(() => {
       root: path.join(__dirname, 'public')
     });
   });
-  app.server.listen(process.env.PORT || 3000);
-  console.log(`Started on port ${app.server.address().port}`);
+  app.server.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0', () => {
+    console.log(`Started on port ${app.server.address().address}:${app.server.address().port}`);
+  });
 });
 
 export default app;

@@ -21,4 +21,4 @@ git pull
 echo "- Installing npm dependencies..."
 npm install
 echo "- (Re)starting server..."
-npm start  # here must not suck
+sudo service cpr restart
