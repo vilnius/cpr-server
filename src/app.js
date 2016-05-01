@@ -66,6 +66,14 @@ db(() => {
     console.log(`Started on port ${app.server.address().address}:${app.server.address().port}`);
   });
 
+  // Requires running mosquitto broker server on localhost:1883
+  // for OS X
+  //
+  // brew install mosquitto
+  //
+  // for ubuntu
+  //
+  // sudo apt-get install mosquitto
   mqttListener();
 });
 

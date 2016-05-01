@@ -4,6 +4,7 @@ import users from './users';
 import auth from './auth';
 import penalties from './penalties';
 import images from './images';
+import piStatus from './piStatus';
 
 export default function() {
   var api = Router();
@@ -20,6 +21,7 @@ export default function() {
   api.use('/lanemaps', lanemaps());
   api.use('/penalties', penalties());
   api.use('/images', images());
+  api.use('/pistatus', piStatus());
 
   api.get('*', function(req, res, next) {
     res.status(404).json({
