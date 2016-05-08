@@ -38,6 +38,22 @@ export default function() {
     });
 
   });
+  
+ //get white plate by vehicle number
+  api.get('/number/:number', isAuthenticated, (req, res) => {
+    var number = req.params.number;
+
+    WhitePlate.find({plate: number}, (err, data) => {
+      if (err) {
+        return res.status(400).json({ error: err.toString() });
+      }
+      if (data.length === 0 || !data) {
+        return res.status(404).json({status: 404, message: `Plate: ${number} not found.`});
+      }
+      res.json(data)
+    });
+
+  });
 
   api.post('/:id', isAuthenticated, (req, res) => {
     var id = req.params.id;
