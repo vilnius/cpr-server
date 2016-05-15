@@ -14,7 +14,7 @@ var User = new Schema({
     trim: true
   }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 // Creates fields/methods required for authentication middleware

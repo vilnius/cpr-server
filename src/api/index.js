@@ -3,6 +3,7 @@ import lanemaps from './lanemaps';
 import users from './users';
 import auth from './auth';
 import penalties from './penalties';
+import whitelist from './whitelist';
 import images from './images';
 import piStatus from './piStatus';
 
@@ -20,6 +21,7 @@ export default function() {
   api.use('/users', users());
   api.use('/lanemaps', lanemaps());
   api.use('/penalties', penalties());
+  api.use('/whitelist', whitelist());
   api.use('/images', images());
   api.use('/pistatus', piStatus());
 
