@@ -5,6 +5,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import session from 'express-session';
+import connectMongo from 'connect-mongo'
 import logger from 'morgan';
 
 import passport from 'passport';
@@ -32,22 +33,29 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(logger('dev'));
 
-app.use(session({
-  secret: config.SECRET,
-  resave: false,
-  saveUninitialized: false
-}));
+db((connection) => {
 
-// Configure passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
+  const MongoStore = connectMongo(session);
+  app.use(session({
+    secret: config.SECRET,
+    saveUninitialized: false,   // don't create session until something stored
+    resave: false,              // don't save session if unmodified
+    store: new MongoStore({
+      mongooseConnection: connection,
+      ttl: 14 * 24 * 60 * 60,   // session expiration = 14 days. Default
+      touchAfter: 24 * 60 * 60  // update session only once every 24 hours
+    })
+  }));
 
-// Configure passport-local to use user model for authentication
-passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+  // Configure passport middleware
+  app.use(passport.initialize());
+  app.use(passport.session());
 
-db(() => {
+  // Configure passport-local to use user model for authentication
+  passport.use(User.createStrategy());
+  passport.serializeUser(User.serializeUser());
+  passport.deserializeUser(User.deserializeUser());
+
   createAdminUser(User);
   // internal middleware
   app.use(middleware());
