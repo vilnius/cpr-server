@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 var Schema = mongoose.Schema;
 
 var Lanemap = new Schema({
+  _id: String,
   name: {
     type: String,
     required: true,
@@ -12,7 +13,7 @@ var Lanemap = new Schema({
     required: true
   }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 export default mongoose.model('Lanemap', Lanemap);

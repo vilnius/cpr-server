@@ -13,7 +13,7 @@ var Penalty = new Schema({
   plates: [PlateSchema],
   shotAt: Date
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 export default mongoose.model('Penalty', Penalty);
