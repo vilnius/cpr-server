@@ -34,9 +34,9 @@ export default function() {
           //A - garage Nr, B - automobile description, C - plane number
           for (var i = 2; i <= rows; i++) {
             saveWhitePlate({
-              plate: worksheet["C"+i].v,
-              description: worksheet["B"+i].v,
-              garageNr: worksheet["A"+i].v
+              plate: worksheet["C" + i].v,
+              description: worksheet["B" + i].v,
+              garageNr: worksheet["A" + i].v
             });
           }     
           res.json("OK")
