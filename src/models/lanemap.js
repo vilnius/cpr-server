@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 var Schema = mongoose.Schema;
 
 var Lanemap = new Schema({
+  _id: String,
   name: {
     type: String,
     required: true,
