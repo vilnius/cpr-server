@@ -6,7 +6,7 @@ var WhitePlate = new Schema({
   description: String,
   garageNr: String
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 export default mongoose.model('WhitePlate', WhitePlate);
