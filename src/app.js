@@ -15,6 +15,7 @@ import {User} from './models';
 import middleware from './middleware';
 import db from './db';
 import api from './api';
+import mqttListener from './mqttListener';
 
 import * as config from '../config';
 import {createAdminUser} from './helpers';
@@ -72,6 +73,8 @@ db((connection) => {
   app.server.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0', () => {
     console.log(`Started on port ${app.server.address().address}:${app.server.address().port}`);
   });
+
+  mqttListener();
 });
 
 export default app;

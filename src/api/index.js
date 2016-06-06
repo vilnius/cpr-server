@@ -5,6 +5,7 @@ import auth from './auth';
 import penalties from './penalties';
 import whitelist from './whitelist';
 import images from './images';
+import piStatus from './pistatus';
 
 export default function() {
   var api = Router();
@@ -22,6 +23,7 @@ export default function() {
   api.use('/penalties', penalties());
   api.use('/whitelist', whitelist());
   api.use('/images', images());
+  api.use('/pistatus', piStatus());
 
   api.get('*', function(req, res, next) {
     res.status(404).json({

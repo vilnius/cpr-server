@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
+    "mqtt-client": "node examples/mqtt-client.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "mime": "^1.3.4",
     "mongoose": "^4.4.7",
     "morgan": "^1.7.0",
+    "mqtt": "^1.10.0",
     "multer": "^1.1.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
