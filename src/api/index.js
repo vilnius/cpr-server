@@ -5,7 +5,7 @@ import auth from './auth';
 import penalties from './penalties';
 import whitelist from './whitelist';
 import images from './images';
-import piStatus from './piStatus';
+import piStatus from './pistatus';
 
 export default function() {
   var api = Router();

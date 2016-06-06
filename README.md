@@ -18,6 +18,18 @@ npm install
 npm run start
 ```
 
+## MQTT
+
+Server requires running mosquitto broker server on `localhost:1883`. For OS X:
+> brew install mosquitto
+
+For Ubuntu mosquitto from official repo does not work, install using these commands:
+
+> sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+> sudo apt-get update
+> sudo apt-get install mosquitto libmosquitto-dev mosquitto-clients
+> sudo service mosquitto status  # check to see if it's running
+
 ## API
 
 All cpr-server API endpoints start with `/api`.
