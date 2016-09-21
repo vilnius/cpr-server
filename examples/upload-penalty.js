@@ -31,40 +31,40 @@ function generateRandomPenalty(imageId) {
         ],
         shotAt: new Date()
     };
-};
+}
 
 /* LOGIN */
 request({
-    url: config.LOGIN, 
+    url: config.LOGIN,
     method: 'POST',
     body: { username: config.USERNAME, password: config.PASSWORD},
     json: true
 }, function (error, response, body) {
-    if (error || response.statusCode !== 200) { 
+    if (error || response.statusCode !== 200) {
         return console.log('Unable to login!', body);
     }
     /* UPLOAD IMAGE */
     request({
-        url: config.IMAGES, 
+        url: config.IMAGES,
         method: 'POST',
         formData: {
             image: fs.createReadStream(config.FILENAME)
         }
     }, function (error, response, body) {
-        if (error || response.statusCode !== 201) { 
+        if (error || response.statusCode !== 201) {
             return console.log('Unable to upload image!', body);
         }
-        var imageId = JSON.parse(body).filename
+        var imageId = JSON.parse(body).filename;
         console.log("Image saved as ", imageId);
 
         /* CREATE PENALTY */
         request({
-            url: config.PENALTIES, 
+            url: config.PENALTIES,
             method: 'POST',
             body: generateRandomPenalty(imageId),
             json: true
         }, function (error, response, body) {
-            if (error || response.statusCode !== 201) { 
+            if (error || response.statusCode !== 201) {
                 return console.log('Unable to create penalty!', body);
             }
             console.log("Penalty created!", body);

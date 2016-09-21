@@ -13,7 +13,7 @@ export default function() {
     });
   });
 
-  api.post('/', (req, res) => {
+  api.post('/', isAuthenticated, (req, res) => {
     var lanemap = new Lanemap(req.body);
 
     lanemap.save((err, data) => {
@@ -39,7 +39,7 @@ export default function() {
 
   });
 
-  api.post('/:id', (req, res) => {
+  api.post('/:id', isAuthenticated, (req, res) => {
     var id = req.params.id;
 
     Lanemap.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {
