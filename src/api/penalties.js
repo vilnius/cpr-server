@@ -20,7 +20,7 @@ export default function() {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
-      res.status(201).json(data)
+      res.status(201).json(data);
     });
   });
 
@@ -34,7 +34,7 @@ export default function() {
       if (!data) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(data)
+      res.json(data);
     });
 
   });
@@ -49,7 +49,7 @@ export default function() {
       if (!data) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(data)
+      res.json(data);
     });
 
   });

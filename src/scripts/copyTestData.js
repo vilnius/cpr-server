@@ -1,6 +1,5 @@
 var promisify = require('deferred').promisify;
-var fs = require("fs");
-var path = require("path");
+var fs = require('fs');
 
 var readdir = promisify(fs.readdir);
 var config = require('./config.js');
@@ -8,19 +7,19 @@ var config = require('./config.js');
 var testImageDir = 'test_images';
 
 function scanTestImageDirectory() {
-    return readdir(testImageDir);
+  return readdir(testImageDir);
 }
 
 function copyFilesToIncomingDir(filePaths) {
-    filePaths.forEach(function(filePath) {
-        console.log('copying... ' + filePath);
-        fs.createReadStream(testImageDir + '/' + filePath)
+  filePaths.forEach(function(filePath) {
+    console.log('copying... ' + filePath);
+    fs.createReadStream(testImageDir + '/' + filePath)
             .pipe(fs.createWriteStream(config.incomingImagesDir + '/' + filePath));
-    });
+  });
 }
 
 function copyFilesForTesting() {
-    scanTestImageDirectory().then(copyFilesToIncomingDir);
+  scanTestImageDirectory().then(copyFilesToIncomingDir);
 }
 
 copyFilesForTesting();

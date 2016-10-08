@@ -17,7 +17,7 @@ var piStatus = new Schema({
     required: true
   },
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 export default mongoose.model('piStatus', piStatus);

@@ -3,19 +3,17 @@ import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
 import session from 'express-session';
-import connectMongo from 'connect-mongo'
+import connectMongo from 'connect-mongo';
 import logger from 'morgan';
 
 import passport from 'passport';
-import {Strategy as LocalStrategy} from 'passport-local';
 
 import {User} from './models';
 import middleware from './middleware';
 import db from './db';
 import api from './api';
-import mqttListener from './mqttListener';
+import setupMqttListener from './mqttListener';
 
 import * as config from '../config';
 import {createAdminUser} from './helpers';
@@ -74,7 +72,7 @@ db((connection) => {
     console.log(`Started on port ${app.server.address().address}:${app.server.address().port}`);
   });
 
-  mqttListener();
+  setupMqttListener();
 });
 
 export default app;

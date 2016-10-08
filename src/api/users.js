@@ -13,10 +13,10 @@ export default function() {
     });
   });
 
-  api.post('/', isAuthenticated, (req, res, next) => {
+  api.post('/', isAuthenticated, (req, res) => {
     var {username, password} = req.body;
 
-    User.register(new User(req.body), password, (err, user) => {
+    User.register(new User(req.body), password, (err) => {
       if (err) {
         return res.status(400).json({ error: `Error registering username: ${err}` });
       }
@@ -32,7 +32,7 @@ export default function() {
       if (!user) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(user)
+      res.json(user);
     });
 
   });

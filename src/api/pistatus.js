@@ -6,7 +6,7 @@ import { piStatus } from '../models';
 export default function() {
   var api = Router();
 
-  api.get('/', (req, res) => {
+  api.get('/', isAuthenticated, (req, res) => {
     piStatus.find({}, (err, data) => {
       if (err) throw err;
       res.json(data);

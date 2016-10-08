@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export default function(callback) {
+  mongoose.Promise = global.Promise;
   mongoose.connect('mongodb://localhost/cpr');
   var db = mongoose.connection;
 

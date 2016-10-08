@@ -25,7 +25,7 @@ export default function() {
   api.use('/images', images());
   api.use('/pistatus', piStatus());
 
-  api.get('*', function(req, res, next) {
+  api.get('*', function(req, res) {
     res.status(404).json({
       message: 'Not found: Unknown endpoint URL and/or method'
     });

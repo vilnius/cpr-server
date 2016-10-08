@@ -17,7 +17,7 @@ export default function() {
   });
 
   api.post('/upload', isAuthenticated, uploader.single('uploads'), (req, res) => {
-    var workbook = xlsx.read(toByteString(req.file), {type:"binary"});
+    var workbook = xlsx.read(toByteString(req.file), {type:'binary'});
     var worksheet = workbook.Sheets[workbook.SheetNames[0]];
     //get number of rows
     var range = xlsx.utils.decode_range(worksheet['!ref']);
@@ -26,14 +26,14 @@ export default function() {
     //provided file has this structure:x
     //A - garage Nr, B - automobile description, C - plane number
     for (var i = 2; i <= rows + 1; i++) {
-      if (worksheet["A" + i] === undefined || worksheet["B" + i] === undefined || worksheet["C" + i] === undefined) {
+      if (worksheet['A' + i] === undefined || worksheet['B' + i] === undefined || worksheet['C' + i] === undefined) {
         console.log(i);
-        console.log(worksheet["A" + i], worksheet["B" + i], worksheet["C" + i]);
+        console.log(worksheet['A' + i], worksheet['B' + i], worksheet['C' + i]);
       }
       saveWhitePlate({
-        plate: worksheet["C" + i] ? worksheet["C" + i].v : '',
-        description: worksheet["B" + i] ? worksheet["B" + i].v : '',
-        garageNr: worksheet["A" + i] ? worksheet["C" + i].v : ''
+        plate: worksheet['C' + i] ? worksheet['C' + i].v : '',
+        description: worksheet['B' + i] ? worksheet['B' + i].v : '',
+        garageNr: worksheet['A' + i] ? worksheet['C' + i].v : ''
       });
     }
     totalWhiteplates().then(
@@ -41,9 +41,9 @@ export default function() {
         res.json({
           'total': total,
           'new': rows
-        })
+        });
       }
-    )
+    );
   });
 
   api.post('/', isAuthenticated, (req, res) => {
@@ -53,7 +53,7 @@ export default function() {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
-      res.status(201).json(data)
+      res.status(201).json(data);
     });
   });
 
@@ -68,7 +68,7 @@ export default function() {
       if (data.length === 0 || !data) {
         return res.status(404).json({status: 404, message: `Plate: ${number} not found.`});
       }
-      res.json(data)
+      res.json(data);
     });
 
   });
@@ -83,7 +83,7 @@ export default function() {
       if (!data) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(data)
+      res.json(data);
     });
 
   });
@@ -98,7 +98,7 @@ export default function() {
       if (!data) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(data)
+      res.json(data);
     });
 
   });
@@ -113,7 +113,7 @@ export default function() {
       if (!data) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(data)
+      res.json(data);
     });
 
   });
@@ -126,15 +126,15 @@ export default function() {
     var arr = new Array();
     for(var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
 
-    return arr.join("");
+    return arr.join('');
   }
 
   function saveWhitePlate(whitePlate) {
     var whiteplate = new WhitePlate(whitePlate);
 
-    whiteplate.save((err, data) => {
+    whiteplate.save((err) => {
       if (err) {
-        //handle err
+        console.error(err);
       }
     });
   }
@@ -143,7 +143,7 @@ export default function() {
     return new Promise(function(resolve,reject) {
       WhitePlate.find({}, (err, data) => {
         if (err) {
-          reject(0)
+          reject(0);
         } else {
           resolve(data.length);
         }
