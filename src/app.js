@@ -3,9 +3,11 @@ import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import connectMongo from 'connect-mongo';
 import logger from 'morgan';
+import csrf from 'csurf';
 
 import passport from 'passport';
 
@@ -56,18 +58,21 @@ db((connection) => {
   passport.deserializeUser(User.deserializeUser());
 
   createAdminUser(User);
+
+  app.use(cookieParser());
+  app.use(csrf({ cookie: true }));
+
   // internal middleware
   app.use(middleware());
   // api router
   app.use('/api', api());
-  // static files
-  app.use(express.static(config.STATIC_ROOT));
-  // redirect all to index
-  app.get('*', function (req, res) {
-    res.sendFile('index.html', {
-      root: path.join(__dirname, 'public')
-    });
+  // serve index page and provide CSRF token
+  app.get('/', (req, res) => {
+    res.cookie('XSRF-TOKEN', req.csrfToken()).sendFile(path.join(config.STATIC_ROOT, 'index.html'));
   });
+  // serve static files
+  app.use(express.static(config.STATIC_ROOT));
+
   app.server.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0', () => {
     console.log(`Started on port ${app.server.address().address}:${app.server.address().port}`);
   });
