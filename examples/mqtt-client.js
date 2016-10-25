@@ -1,24 +1,38 @@
 // mqtt client example
-var mqtt, regData, connOpt, fakeId;
+var mqtt = require('mqtt');
+var os = require('os');
+var dns = require('dns');
 
-fakeClientId = '001';
+var clientId = '003';
+var brokerUrl = 'mqtt://195.182.82.79:1883';
 
-mqtt = require('mqtt');
-
-regData = JSON.stringify({
-  id: fakeClientId,
-  ip: '0.0.0.0'
-});
-
-connOpts = {
+var connOpts = {
   will: {
     topic: 'unreg',
-    payload: JSON.stringify({id: fakeClientId})
+    payload: JSON.stringify({id: clientId})
   }
 };
 
-client = mqtt.connect('mqtt://127.0.0.1:1883', connOpts);
+var hostname = os.hostname();
+var client = mqtt.connect(brokerUrl, connOpts);
 
-client.on('connect', function () {
-  client.publish('reg', regData);
+dns.lookup(hostname, function (err, ipAddress) {
+  if (err) throw err;
+
+  var message = {
+    id: clientId,
+    ip: ipAddress,
+    data: {
+      hostname: hostname,
+      uptime: os.uptime(),
+      totalmem: os.totalmem(),
+      freemem: os.freemem(),
+      load: os.loadavg()
+    }
+  };
+
+  client.on('connect', function () {
+    console.log("Sending data: ", message);
+    client.publish('reg', JSON.stringify(message));
+  });
 });
