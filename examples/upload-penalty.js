@@ -8,7 +8,7 @@ var request = require('request');
 var fs = require('fs');
 
 var config = require('./config.js');
-var request = request.defaults({ jar: true });  // store cookies
+var requestp = require('./utils').requestp;
 
 function random(low, high) {
     return Math.random() * (high - low) + low;
@@ -33,41 +33,66 @@ function generateRandomPenalty(imageId) {
     };
 }
 
-/* LOGIN */
-request({
-    url: config.LOGIN,
-    method: 'POST',
-    body: { username: config.USERNAME, password: config.PASSWORD},
-    json: true
-}, function (error, response, body) {
-    if (error || response.statusCode !== 200) {
-        return console.log('Unable to login!', body);
+function extractXsrfToken(response, callback) {
+    var cookies = response.headers['set-cookie'].join();
+    var match = /XSRF-TOKEN=(.*?);/i.exec(cookies);
+    if (match) {
+        callback(match[1]);
+    } else {
+        throw new Error('XSRF Token not found');
     }
-    /* UPLOAD IMAGE */
-    request({
+}
+
+function login(headers) {
+    return requestp({
+        url: config.LOGIN,
+        method: 'POST',
+        body: { username: config.USERNAME, password: config.PASSWORD},
+        headers,
+        json: true
+    }).then(() => {
+        console.log('Login successful!');
+    });
+}
+
+function processFile(filename, headers) {
+    console.log('Uploading', filename);
+    return requestp({
         url: config.IMAGES,
         method: 'POST',
+        headers,
         formData: {
-            image: fs.createReadStream(config.FILENAME)
+            image: fs.createReadStream(filename)
         }
-    }, function (error, response, body) {
-        if (error || response.statusCode !== 201) {
-            return console.log('Unable to upload image!', body);
-        }
-        var imageId = JSON.parse(body).filename;
-        console.log("Image saved as ", imageId);
+    })
+    .then(response => JSON.parse(response.body).filename)
+    .then(imageId => createPenalty(imageId, headers));
+}
 
-        /* CREATE PENALTY */
-        request({
-            url: config.PENALTIES,
-            method: 'POST',
-            body: generateRandomPenalty(imageId),
-            json: true
-        }, function (error, response, body) {
-            if (error || response.statusCode !== 201) {
-                return console.log('Unable to create penalty!', body);
-            }
-            console.log("Penalty created!", body);
-        });
-    });
-});
+function createPenalty(imageId, headers) {
+    console.log('Creating penalty for imageId', imageId);
+    return requestp({
+        url: config.PENALTIES,
+        method: 'POST',
+        headers,
+        body: generateRandomPenalty(imageId),
+        json: true
+    })
+    .then(response => console.log('Penalty created successfully!', response.body));
+}
+
+//
+// Main application
+//
+// Get XSRF TOKEN ---> LOGIN ---> UPLOAD IMAGE ---> CREATE PENALTY
+
+const headers = {};
+
+console.log(`Start uploading ${config.FILENAME}...`);
+
+requestp({ url: config.URL })
+    .then(response => new Promise(resolve => extractXsrfToken(response, resolve)))
+    .then(xsrftoken => headers['x-xsrf-token'] = xsrftoken)
+    .then(() => login(headers))
+    .then(() => processFile(config.FILENAME, headers))
+    .catch(err => console.error('Upload failed', err));

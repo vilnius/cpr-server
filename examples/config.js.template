@@ -1,4 +1,4 @@
-var URL = "http://localhost:3000";
+var URL = "https://cpr.vilnius.lt";
 
 module.exports = {
     FILENAME: "1.png",
