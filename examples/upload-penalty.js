@@ -45,7 +45,7 @@ function extractXsrfToken(response, callback) {
 
 function login(headers) {
     return requestp({
-        url: config.LOGIN,
+        uri: config.LOGIN,
         method: 'POST',
         body: { username: config.USERNAME, password: config.PASSWORD},
         headers,
@@ -58,7 +58,7 @@ function login(headers) {
 function processFile(filename, headers) {
     console.log('Uploading', filename);
     return requestp({
-        url: config.IMAGES,
+        uri: config.IMAGES,
         method: 'POST',
         headers,
         formData: {
@@ -72,7 +72,7 @@ function processFile(filename, headers) {
 function createPenalty(imageId, headers) {
     console.log('Creating penalty for imageId', imageId);
     return requestp({
-        url: config.PENALTIES,
+        uri: config.PENALTIES,
         method: 'POST',
         headers,
         body: generateRandomPenalty(imageId),
@@ -90,7 +90,7 @@ const headers = {};
 
 console.log(`Start uploading ${config.FILENAME}...`);
 
-requestp({ url: config.URL })
+requestp({ uri: config.URL })
     .then(response => new Promise(resolve => extractXsrfToken(response, resolve)))
     .then(xsrftoken => headers['x-xsrf-token'] = xsrftoken)
     .then(() => login(headers))
