@@ -1,15 +1,19 @@
 var fs       = require('fs'),
-  path     = require('path'),
-  deferred = require('deferred'),
-  exec     = require('child_process').exec,
-  moment = require('moment');
-
+    path     = require('path'),
+    deferred = require('deferred'),
+    exec     = require('child_process').exec,
+    moment   = require('moment'),
+    r        = require('request'),
+    URI      = require('./config').URL,
+    request = r.defaults({ jar: true, uri: URI });
 
 //noinspection JSUnresolvedVariable
 module.exports = {
   execDeffered       : execDeffered,
   getImageEXIF       : getImageEXIF,
-  moveProcessedImage : moveProcessedImage
+  moveProcessedImage : moveProcessedImage,
+  requestp           : requestp,
+  extractXsrfToken   : extractXsrfToken
 };
 
 function execDeffered(command) {
@@ -82,3 +86,29 @@ function getDestinationDirectory(destinationDir) {
   return processedImagesDir;
 }
 
+function requestp(options) {
+  console.log('options', options);
+  return new Promise((resolve, reject) => {
+    request(options, (err, res, body) => {
+      if (err) {
+        reject(err);
+      } else if (res.statusCode >= 400) {
+        err = new Error('Unexpected status code: ' + res.statusCode);
+        err.res = res;
+        reject(err);
+      }
+      resolve(res, body);
+    });
+  });
+}
+
+
+function extractXsrfToken(response, callback) {
+  var cookies = response.headers['set-cookie'].join();
+  var match = /XSRF-TOKEN=(.*?);/i.exec(cookies);
+  if (match) {
+    callback(match[1]);
+  } else {
+    throw new Error('XSRF Token not found');
+  }
+}
