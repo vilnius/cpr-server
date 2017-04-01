@@ -10,5 +10,6 @@ module.exports = {
   LOGIN: URL + "/api/auth/login",
   IMAGES: URL + "/api/images",
   PENALTIES: URL + "/api/penalties",
-  URL : URL
+  URL : URL,
+  OCRCOMMAND: 'docker run -i --rm -v $(pwd):/data:ro openalpr -j -c eu "'
 };

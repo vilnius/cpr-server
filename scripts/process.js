@@ -60,7 +60,7 @@ function runOCR(imagePaths) {
       if(checkFileIntegrity(imagePath)) {
         imagePath = config.incomingImagesDir + '/' + imagePath;
         console.log('processing image: ', imagePath);
-        execute('alpr -j -c eu "' + imagePath + '"')
+        execute(config.OCRCOMMAND + imagePath + '"')
             .then(function(data) {
               console.log('parsing ocr data... ');
               var ocrData = JSON.parse(data);
