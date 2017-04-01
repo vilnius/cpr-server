@@ -3,6 +3,8 @@ import { Router } from 'express';
 import { isAuthenticated } from '../helpers';
 import { Penalty } from '../models';
 
+import { Types } from 'mongoose';
+
 export default function() {
   var api = Router();
 
@@ -10,6 +12,16 @@ export default function() {
     Penalty.find({}, (err, data) => {
       if (err) throw err;
       res.json(data);
+    });
+  });
+
+  api.delete('/', isAuthenticated, (req, res) => {
+    var ids = req.body.ids.map(id => Types.ObjectId(id));
+    Penalty.remove({ '_id': { $in: ids } }, (err, data) => {
+      if (err) {
+        return res.status(400).json({ error: err.toString() });
+      }
+      res.json({ message: `${ids.length} penalties deleted` });
     });
   });
 
@@ -53,7 +65,6 @@ export default function() {
     });
 
   });
-
 
   return api;
 }
