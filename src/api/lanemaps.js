@@ -24,8 +24,9 @@ export default function() {
     });
   });
 
-  api.get('/:id', (req, res) => {
+  api.get('/:id/:attribute?', (req, res) => {
     var id = req.params.id;
+    var attribute = req.params.attribute;
 
     Lanemap.findById(id, (err, data) => {
       if (err) {
@@ -34,7 +35,11 @@ export default function() {
       if (!data) {
         return res.status(404).json({status: 404, message: `Not found: ${id}`});
       }
-      res.json(data);
+      if (attribute && /geojson/i.test(attribute)) {
+        res.json(data.geoJSON);
+      } else {
+        res.json(data);
+      }
     });
 
   });
