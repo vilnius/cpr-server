@@ -9,10 +9,31 @@ export default function() {
   var api = Router();
 
   api.get('/', isAuthenticated, (req, res) => {
-    Penalty.find({}, (err, data) => {
-      if (err) throw err;
-      res.json(data);
-    });
+    var perPage = parseInt(req.query.perPage),
+        page = parseInt(req.query.page);
+
+    perPage = isNaN(perPage) ? 10 : perPage;
+    page = isNaN(page) ? 1 : page;
+
+    Penalty.find({})
+      .limit(perPage)
+      .skip(perPage*(page-1))
+      .sort({ updatedAt: -1 })
+      .exec((err, data) => {
+        if (err) throw err;
+        Penalty.count().exec((err, count) => {
+          var response = {
+            pagination: {
+              page,
+              perPage,
+              total: count,
+              pages: Math.ceil(count/perPage)
+            },
+            objects: data
+          }
+          res.json(response);
+        });
+      });
   });
 
   api.delete('/', isAuthenticated, (req, res) => {
