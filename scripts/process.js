@@ -1,25 +1,41 @@
 var deferred = require('deferred');
-
 var promisify = deferred.promisify;
-
 var fs = require('fs');
-
 var readdir = promisify(fs.readdir);
-
 var config = require('./config.js');
 var utils = require('./utils.js');
 var execute = utils.execDeffered;
+var _ = require('lodash');
 
 function start() {
   console.log('starting...');
-  return readdir(config.incomingImagesDir).then(runOCR);
+  return readdir(config.incomingImagesDir)
+    .then((imagePaths) => {
+      imagePaths = imagePaths.filter(isAllowedExtensionFile);
+
+      return runOCR(imagePaths);
+    });
+}
+
+function isAllowedExtensionFile(filePath) {
+  const fileExtension = filePath
+    .split('.')
+    .pop()
+    .toLowerCase();
+
+  return config.allowedImagesExtensions
+    .indexOf(fileExtension) !== -1;
 }
 
 function generateReport(imageData) {
+  // Move image
+  var newImageLocation = utils.moveProcessedImage(
+    imageData,
+    config.incomingImagesDir,
+    config.reportImageDir
+  );
 
-  //move image
-  var newImageLocation = utils.moveProcessedImage(imageData, config.incomingImagesDir, config.reportImageDir);
-  if(!newImageLocation) {
+  if (!newImageLocation) {
     console.log('generate report failed.. wrong destination path');
     return false;
   }
@@ -29,7 +45,7 @@ function generateReport(imageData) {
   var exifData = imageData.exifData;
 
   var reportObject = {
-      localPath : newImageLocation,
+    localPath : newImageLocation,
     imagePath : config.staticServerUrl + newImageLocation,
     imageCaptured : exifData.FileModifyDate,
     reportCreated : new Date().toISOString(),
@@ -53,37 +69,56 @@ function parseEXIF(ocrObj) {
 }
 
 function runOCR(imagePaths) {
-  if(imagePaths) {
-    console.log('starting ocr process...');
-    console.log(imagePaths);
-    imagePaths.forEach(function(imagePath){
-      if(checkFileIntegrity(imagePath)) {
-        imagePath = config.incomingImagesDir + '/' + imagePath;
-        console.log('processing image: ', imagePath);
-        execute(config.OCRCOMMAND + imagePath + '"')
-            .then(function(data) {
-              console.log('parsing ocr data... ');
-              var ocrData = JSON.parse(data);
-              ocrData.imagePath = imagePath;
-              if(ocrData.results.length < 1) {
-                console.log('there are no results for image. removing..: ', imagePath);
-                fs.unlink(imagePath);
-                var def = deferred();
-                return def.reject();
-              }
-              return ocrData;
-            })
-            .then(parseEXIF)
-            .then(generateReport);
-      }
-    });
-  } else {
-    console.log('no images found in directory exiting...');
+  if (imagePaths && imagePaths.length === 0) {
+    console.log('no images to process exiting...');
+    return;
   }
 
-  if(imagePaths.length < 1) {
-    console.log('no images to process exiting...');
+  console.log('starting ocr process...');
+  console.log(imagePaths);
+
+  imagePaths
+    .filter(checkFileIntegrity)
+    .forEach((imagePath) => {
+
+      imagePath = config.incomingImagesDir + '/' + imagePath;
+      console.log('processing image: ', imagePath);
+      execute(config.OCRCOMMAND + imagePath + '"')
+        .then((data) => {
+            var ocrData = parseAndPrepareOCROutput(
+              data, imagePath
+            );
+
+            return ocrData
+              ? ocrData
+              : deferred.reject();
+        })
+        .then(parseEXIF)
+        .then(generateReport);
+
+  });
+}
+
+function parseAndPrepareOCROutput(outputString, imagePath) {
+  var ocrData = JSON.parse(outputString),
+      results = ocrData.results,
+      candidates = _.get(results, '[0].candidates', []);
+
+  candidates = candidates
+    .filter(candidate => candidate.matches_template)
+    .filter(candidate => candidate.confidence >= config.limitToPlateConfidence)
+    .splice(-1 * config.limitToPlateCandidates);
+
+  if (results.length === 0 || candidates.length === 0) {
+    console.log('there are no results for image. removing..: ', imagePath);
+    fs.unlink(imagePath);
+    return false;
   }
+
+  ocrData.results[0].candidates = candidates;
+  ocrData.imagePath = imagePath;
+
+  return ocrData;
 }
 
 function checkFileIntegrity(imagePath) {
@@ -110,9 +145,9 @@ function processFile(filename, headers, report) {
         formData: {
             image: fs.createReadStream(filename)
         }
-    })
-        .then(response => JSON.parse(response.body).filename)
-        .then(imageId => createPenalty(imageId, headers, report));
+      })
+      .then(response => JSON.parse(response.body).filename)
+      .then(imageId => createPenalty(imageId, headers, report));
 }
 
 function createPenalty(imageId, headers, report) {

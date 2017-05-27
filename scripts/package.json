@@ -8,12 +8,13 @@
   },
   "devDependencies": {
     "deferred": "^0.7.5",
+    "lodash": "^4.17.4",
     "moment": "^2.12.0"
   },
   "scripts": {
     "test": "test.js",
-    "start" : "nodejs process.js",
-    "copy" : "nodejs copyTestData.js"
+    "start": "nodejs process.js",
+    "copy": "nodejs copyTestData.js"
   },
   "author": "JS",
   "license": "MIT"
