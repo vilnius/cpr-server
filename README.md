@@ -1,7 +1,7 @@
 # Car Plate Reader Server
 
 API backend of CPR application, also serves frontend single page application
-[cpr-frontend](https://github.com/vilnius/cpr-frontend). 
+[cpr-frontend](https://github.com/vilnius/cpr-frontend).
 Built using node.js, express, passport, mongoose (MongoDB).
 
 ## Running cpr-server
@@ -17,6 +17,24 @@ npm run start
 Application will create default user `admin` with password `admin` on first run.
 Navigate to http://localhost:3000 on your browser.
 API root is at http://localhost:3000/api.
+
+## Exiftool
+
+Server requires exiftool binary installed
+
+Installation Mac OS X:
+
+```
+sudo brew update
+sudo brew install exiftool
+```
+
+Installation Linux:
+
+```
+sudo apt-get update
+sudo apt-get install libimage-exiftool-perl
+```
 
 ## MQTT
 

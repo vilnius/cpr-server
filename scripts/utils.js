@@ -66,7 +66,7 @@ function moveProcessedImage(imageData, targetDir, destinationDir) {
   var imageCapturedAt  = moment(imageData.exifData.FileModifyDate, 'Y:MM:DDD HH:mm:ss').format('Y-MM-DD_HH-mm-ss');
   var imageProcessedAt = moment().format('Y-MM-DD_HH-ss-SSS');
 
-  if(!imageCapturedAt) {
+  if (!imageCapturedAt) {
     console.error('FAILED TO PROCESS EXIF DATE ', imageData.exifData.FileModifyDate); //throw error?
     return false;
   }
