@@ -27,6 +27,15 @@ function isAllowedExtensionFile(filePath) {
     .indexOf(fileExtension) !== -1;
 }
 
+function convertGPSDataToNumericFormat(str) {
+  let [ dd, mm, ss ] = str
+      .replace(' deg', '')
+      .split(' ')
+      .map(num => parseFloat(num, 10));
+
+  return dd + (mm * 60 + ss) / 3600;
+}
+
 function generateReport(imageData) {
   // Move image
   var newImageLocation = utils.moveProcessedImage(
@@ -52,8 +61,8 @@ function generateReport(imageData) {
     plateName : ocrData.plate,
     plateConfidence : ocrData.confidence,
     coordinates : {
-      lat : 0,// exifData.gps.lat?
-      lon : 0,// exifData.gps.lon?
+      lat : _.get(imageData, 'exifData.GPSLatitude', '99 99 99'),
+      lon : _.get(imageData, 'exifData.GPSLongitude', '99 99 99'),
     },
     candidates : ocrData.candidates
   };
@@ -62,9 +71,11 @@ function generateReport(imageData) {
 }
 
 function parseEXIF(ocrObj) {
-  return utils.getImageEXIF(ocrObj.imagePath).then(function(exifData) {
-    ocrObj.exifData = exifData[0];
-    return ocrObj;
+  return utils
+    .getImageEXIF(ocrObj.imagePath)
+    .then(exifData => {
+      ocrObj.exifData = exifData[0];
+      return ocrObj;
   });
 }
 
@@ -95,7 +106,6 @@ function runOCR(imagePaths) {
         })
         .then(parseEXIF)
         .then(generateReport);
-
   });
 }
 
@@ -189,8 +199,8 @@ function generatePenalty(imageId, report) {
         image: imageId,
         plate: report.plateName,
         gps: {
-            lat: report.coordinates.lat,
-            lon: report.coordinates.lon
+            lat: convertGPSDataToNumericFormat(report.coordinates.lat),
+            lon: convertGPSDataToNumericFormat(report.coordinates.lon),
         },
         plates: candidates,
         shotAt: report.reportCreated
