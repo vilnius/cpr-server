@@ -25,25 +25,33 @@ export default function() {
     //starts at 1 and the first row is header hence i = 2;
     //provided file has this structure:x
     //A - garage Nr, B - automobile description, C - plane number
+    var promises = [];
     for (var i = 2; i <= rows + 1; i++) {
-      if (worksheet['A' + i] === undefined || worksheet['B' + i] === undefined || worksheet['C' + i] === undefined) {
-        console.log(i);
-        console.log(worksheet['A' + i], worksheet['B' + i], worksheet['C' + i]);
+      if (worksheet['A' + i] === undefined && worksheet['B' + i] === undefined && worksheet['C' + i] === undefined) {
+        console.log('No more plates found starting row', i);
+        break;
       }
-      saveWhitePlate({
-        plate: worksheet['C' + i] ? worksheet['C' + i].v : '',
-        description: worksheet['B' + i] ? worksheet['B' + i].v : '',
-        garageNr: worksheet['A' + i] ? worksheet['C' + i].v : ''
-      });
+      promises.push(saveWhitePlate(
+        worksheet['C' + i] ? worksheet['C' + i].v : '',
+        worksheet['B' + i] ? worksheet['B' + i].v : '',
+        worksheet['A' + i] ? worksheet['C' + i].v : ''
+      ));
     }
-    totalWhiteplates().then(
-      function(total) {
-        res.json({
-          'total': total,
-          'new': rows
-        });
-      }
-    );
+    Promise.all(promises)
+      .then(function(data){
+        var newPlates = data.filter((i) => i === 1).length;
+        totalWhiteplates().then(
+          total => {
+            res.json({
+              'total': total,
+              'imported': data.length,
+              'new': newPlates
+            });
+          });
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
   });
 
   api.post('/', isAuthenticated, (req, res) => {
@@ -129,23 +137,41 @@ export default function() {
     return arr.join('');
   }
 
-  function saveWhitePlate(whitePlate) {
-    var whiteplate = new WhitePlate(whitePlate);
+  function saveWhitePlate(plate, description, garageNr) {
+    plate = plate.replace(/\s/g,'')
+    return new Promise(function(resolve, reject) {
+      WhitePlate.find({ plate }, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        if (data.length === 0 || !data) {
+          // No such plate in database
+          var whiteplate = new WhitePlate({
+            plate, description, garageNr
+          });
 
-    whiteplate.save((err) => {
-      if (err) {
-        console.error(err);
-      }
+          whiteplate.save((err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(1)
+            }
+          });
+        } else {
+          resolve(0);
+        }
+      });
+
     });
   }
 
   function totalWhiteplates() {
-    return new Promise(function(resolve,reject) {
-      WhitePlate.find({}, (err, data) => {
+    return new Promise(function(resolve, reject) {
+      WhitePlate.count({}, (err, count) => {
         if (err) {
           reject(0);
         } else {
-          resolve(data.length);
+          resolve(count);
         }
       });
     });
