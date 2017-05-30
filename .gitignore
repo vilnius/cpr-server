@@ -43,3 +43,7 @@ jspm_packages
 
 # Optional REPL history
 .DS_Store
+
+# Uploadable files
+scripts/incoming
+scripts/processed
