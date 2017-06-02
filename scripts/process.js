@@ -7,8 +7,33 @@ var utils = require('./utils.js');
 var execute = utils.execDeffered;
 var _ = require('lodash');
 
+
+function log() {
+    let args, dateInstance,
+        day, month, year,
+        dateFormatted;
+
+    args = Array.prototype.slice.call(arguments);
+
+    if (!args.length) {
+      return;
+    }
+
+    dateInstance = new Date();
+
+    [ day, month, year ] =
+      dateInstance.toLocaleDateString().split('/');
+
+    dateFormatted =
+        [ year, month, day ].join('-') + ' ' + dateInstance.toLocaleTimeString();
+
+    args.unshift(dateFormatted);
+
+    console.log.apply(console, args);
+}
+
 function start() {
-  console.log('starting...');
+  log('starting...');
   return readdir(config.incomingImagesDir)
     .then((imagePaths) => {
       imagePaths = imagePaths.filter(isAllowedExtensionFile);
@@ -45,7 +70,7 @@ function generateReport(imageData) {
   );
 
   if (!newImageLocation) {
-    console.log('generate report failed.. wrong destination path');
+    log('generate report failed.. wrong destination path');
     return false;
   }
 
@@ -81,19 +106,19 @@ function parseEXIF(ocrObj) {
 
 function runOCR(imagePaths) {
   if (imagePaths && imagePaths.length === 0) {
-    console.log('no images to process exiting...');
+    log('no images to process exiting...');
     return;
   }
 
-  console.log('starting ocr process...');
-  console.log(imagePaths);
+  log('starting ocr process...');
+  log(imagePaths);
 
   imagePaths
     .filter(checkFileIntegrity)
     .forEach((imagePath) => {
 
       imagePath = config.incomingImagesDir + '/' + imagePath;
-      console.log('processing image: ', imagePath);
+      log('processing image: ', imagePath);
       execute(config.OCRCOMMAND + imagePath + '"')
         .then((data) => {
             var ocrData = parseAndPrepareOCROutput(
@@ -120,7 +145,7 @@ function parseAndPrepareOCROutput(outputString, imagePath) {
     .splice(-1 * config.limitToPlateCandidates);
 
   if (results.length === 0 || candidates.length === 0) {
-    console.log('there are no results for image. removing..: ', imagePath);
+    log('there are no results for image. removing..: ', imagePath);
     fs.unlink(imagePath);
     return false;
   }
@@ -147,7 +172,7 @@ function sendReport(reportObject) {
 }
 
 function processFile(filename, headers, report) {
-    console.log('Uploading', filename);
+    log('Uploading', filename);
     return utils.requestp({
         uri: config.IMAGES,
         method: 'POST',
@@ -161,7 +186,7 @@ function processFile(filename, headers, report) {
 }
 
 function createPenalty(imageId, headers, report) {
-    console.log('Creating penalty for imageId', imageId);
+    log('Creating penalty for imageId', imageId);
     return utils.requestp({
         uri: config.PENALTIES,
         method: 'POST',
@@ -170,7 +195,7 @@ function createPenalty(imageId, headers, report) {
         json: true
     }).then(response => {
         fs.unlink(report.localPath);
-        console.log('Penalty created successfully!')
+        log('Penalty created successfully!')
     });
 }
 
@@ -182,12 +207,12 @@ function login(headers) {
         headers,
         json: true
     }).then(() => {
-        console.log('Login successful!');
+        log('Login successful!');
     });
 }
 
 function generatePenalty(imageId, report) {
-    console.log('generating penalty...');
+    log('generating penalty...');
     var candidates = report.candidates.map(candidate => {
         return {
             plate : candidate.plate,
