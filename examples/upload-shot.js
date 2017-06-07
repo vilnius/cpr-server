@@ -1,6 +1,6 @@
 /*
 
-Sample node.js application to create new penalty
+Sample node.js application to create new shot
 based on https://github.com/request/request
 
 */
@@ -18,7 +18,7 @@ function randomPlate() {
     return "GOV" + Math.floor(random(0, 9.9)) + Math.floor(random(0, 9.9)) + Math.floor(random(0, 9.9));
 }
 
-function generateRandomPenalty(imageId) {
+function generateRandomShot(imageId) {
     return {
         image: imageId,
         plate: randomPlate(),
@@ -66,25 +66,25 @@ function processFile(filename, headers) {
         }
     })
     .then(response => JSON.parse(response.body).filename)
-    .then(imageId => createPenalty(imageId, headers));
+    .then(imageId => createShot(imageId, headers));
 }
 
-function createPenalty(imageId, headers) {
-    console.log('Creating penalty for imageId', imageId);
+function createShot(imageId, headers) {
+    console.log('Creating shot for imageId', imageId);
     return requestp({
-        uri: config.PENALTIES,
+        uri: config.SHOTS,
         method: 'POST',
         headers,
-        body: generateRandomPenalty(imageId),
+        body: generateRandomShot(imageId),
         json: true
     })
-    .then(response => console.log('Penalty created successfully!', response.body));
+    .then(response => console.log('Shot created successfully!', response.body));
 }
 
 //
 // Main application
 //
-// Get XSRF TOKEN ---> LOGIN ---> UPLOAD IMAGE ---> CREATE PENALTY
+// Get XSRF TOKEN ---> LOGIN ---> UPLOAD IMAGE ---> CREATE SHOT
 
 const headers = {};
 

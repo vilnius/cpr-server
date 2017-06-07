@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var PlateSchema = new Schema({ plate: String, probability: Number });
 
-var Penalty = new Schema({
+var Shot = new Schema({
   image: String,
   plate: String,
   gps: {
@@ -16,4 +16,4 @@ var Penalty = new Schema({
   timestamps: true
 });
 
-export default mongoose.model('Penalty', Penalty);
+export default mongoose.model('Shot', Shot);

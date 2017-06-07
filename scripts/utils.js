@@ -87,7 +87,6 @@ function getDestinationDirectory(destinationDir) {
 }
 
 function requestp(options) {
-  console.log('options', options);
   return new Promise((resolve, reject) => {
     request(options, (err, res, body) => {
       if (err) {

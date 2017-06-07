@@ -146,8 +146,10 @@ function parseAndPrepareOCROutput(outputString, imagePath) {
 
   if (results.length === 0 || candidates.length === 0) {
     log('there are no results for image. removing..: ', imagePath);
-    fs.unlink(imagePath);
+    fs.unlinkSync(imagePath);
     return false;
+  } else {
+    log(`Plate number found: ${candidates[0].plate} (confidence=${candidates[0].confidence}%)`);
   }
 
   ocrData.results[0].candidates = candidates;
@@ -182,20 +184,20 @@ function processFile(filename, headers, report) {
         }
       })
       .then(response => JSON.parse(response.body).filename)
-      .then(imageId => createPenalty(imageId, headers, report));
+      .then(imageId => createShot(imageId, headers, report));
 }
 
-function createPenalty(imageId, headers, report) {
-    log('Creating penalty for imageId', imageId);
+function createShot(imageId, headers, report) {
+    log('Creating shot for imageId', imageId);
     return utils.requestp({
-        uri: config.PENALTIES,
+        uri: config.SHOTS,
         method: 'POST',
         headers,
-        body: generatePenalty(imageId, report),
+        body: generateShot(imageId, report),
         json: true
     }).then(response => {
-        fs.unlink(report.localPath);
-        log('Penalty created successfully!')
+        fs.unlinkSync(report.localPath);
+        log('Shot created successfully!')
     });
 }
 
@@ -211,8 +213,8 @@ function login(headers) {
     });
 }
 
-function generatePenalty(imageId, report) {
-    log('generating penalty...');
+function generateShot(imageId, report) {
+    log('Generating shot...');
     var candidates = report.candidates.map(candidate => {
         return {
             plate : candidate.plate,

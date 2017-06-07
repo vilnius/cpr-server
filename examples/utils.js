@@ -1,7 +1,7 @@
 var r = require('request');
 var Promise = require('promise');
 
-var URI = require('./utils').URL
+var URI = require('./config').URL
 
 var request = r.defaults({ jar: true, uri: URI });  // store cookies
 

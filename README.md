@@ -76,6 +76,6 @@ Basic CRUD using endpoint `/api/users`.
 
 ### `/lanemaps`
 
-### `/penalties`
+### `/shots`
 
 ### `/whitelist`

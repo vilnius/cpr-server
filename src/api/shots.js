@@ -1,9 +1,10 @@
 import { Router } from 'express';
+import { Types } from 'mongoose';
 
 import { isAuthenticated } from '../helpers';
-import { Penalty } from '../models';
+import { Shot } from '../models';
 
-import { Types } from 'mongoose';
+var DEFAULT_PER_PAGE = 15;
 
 export default function() {
   var api = Router();
@@ -12,16 +13,16 @@ export default function() {
     var perPage = parseInt(req.query.perPage),
         page = parseInt(req.query.page);
 
-    perPage = isNaN(perPage) ? 10 : perPage;
+    perPage = isNaN(perPage) ? DEFAULT_PER_PAGE : perPage;
     page = isNaN(page) ? 1 : page;
 
-    Penalty.find({})
+    Shot.find({})
       .limit(perPage)
       .skip(perPage*(page-1))
       .sort({ updatedAt: -1 })
       .exec((err, data) => {
         if (err) throw err;
-        Penalty.count().exec((err, count) => {
+        Shot.count().exec((err, count) => {
           var response = {
             pagination: {
               page,
@@ -38,18 +39,18 @@ export default function() {
 
   api.delete('/', isAuthenticated, (req, res) => {
     var ids = req.body.ids.map(id => Types.ObjectId(id));
-    Penalty.remove({ '_id': { $in: ids } }, (err, data) => {
+    Shot.remove({ '_id': { $in: ids } }, (err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
-      res.json({ message: `${ids.length} penalties deleted` });
+      res.json({ message: `${ids.length} shots deleted` });
     });
   });
 
   api.post('/', isAuthenticated, (req, res) => {
-    var penalty = new Penalty(req.body);
+    var shot = new Shot(req.body);
 
-    penalty.save((err, data) => {
+    shot.save((err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
@@ -60,7 +61,7 @@ export default function() {
   api.get('/:id', isAuthenticated, (req, res) => {
     var id = req.params.id;
 
-    Penalty.findById(id, (err, data) => {
+    Shot.findById(id, (err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
@@ -75,7 +76,7 @@ export default function() {
   api.post('/:id', isAuthenticated, (req, res) => {
     var id = req.params.id;
 
-    Penalty.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {
+    Shot.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }

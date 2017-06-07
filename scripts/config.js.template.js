@@ -12,7 +12,7 @@ module.exports = {
   PASSWORD: 'admin',
   LOGIN: URL + '/api/auth/login',
   IMAGES: URL + '/api/images',
-  PENALTIES: URL + '/api/penalties',
+  SHOTS: URL + '/api/shots',
   URL : URL,
   OCRCOMMAND: 'docker run -i --rm -v $(pwd):/data:ro openalpr -j -c eu -p lt "'
 };
