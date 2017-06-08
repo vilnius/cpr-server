@@ -1,16 +1,16 @@
 import mongoose from 'mongoose';
-var Schema = mongoose.Schema;
+import { Gps } from './gps';
 
-var PlateSchema = new Schema({ plate: String, probability: Number });
+var Plate = {
+  plate: String,
+  probability: Number
+};
 
-var Shot = new Schema({
+var Shot = new mongoose.Schema({
   image: String,
   plate: String,
-  gps: {
-    lat: { type: Number, required: true },
-    lon: { type: Number, required: true }
-  },
-  plates: [PlateSchema],
+  gps: Gps,
+  plates: [Plate],
   shotAt: Date
 }, {
   timestamps: true

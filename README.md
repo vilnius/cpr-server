@@ -79,3 +79,5 @@ Basic CRUD using endpoint `/api/users`.
 ### `/shots`
 
 ### `/whitelist`
+
+### `/violations`
