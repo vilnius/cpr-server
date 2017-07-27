@@ -70,11 +70,8 @@ export default function() {
     var number = req.query.plate;
 
     WhitePlate.find({plate: number}, (err, data) => {
-      if (err) {
+      if (err || !data)  {
         return res.status(400).json({ error: err.toString() });
-      }
-      if (data.length === 0 || !data) {
-        return res.status(404).json({status: 404, message: `Plate: ${number} not found.`});
       }
       res.json(data);
     });

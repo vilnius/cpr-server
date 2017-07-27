@@ -168,8 +168,17 @@ function sendReport(reportObject) {
         .then(response => new Promise(resolve => utils.extractXsrfToken(response, resolve)))
         .then(xsrftoken => headers['x-xsrf-token'] = xsrftoken)
         .then(() => login(headers))
+        .then(() => isWhitelisted(reportObject, headers))
         .then(() => processFile(reportObject.localPath, headers, reportObject))
-        .catch(err => console.error('Upload failed', err));
+        .catch(err => {
+          if (err.error === 'plateIsWhitelisted') {
+            log('Shot rejected duo to whitelist rules!')
+            fs.unlinkSync(reportObject.localPath);
+          }
+          else {
+            log('Upload failed', err)
+          }
+        });
 
 }
 
@@ -232,6 +241,28 @@ function generateShot(imageId, report) {
         plates: candidates,
         shotAt: report.reportCreated
     };
+}
+
+function isWhitelisted(report, headers) {
+  let isPlateWhitelistedUrl;
+
+  isPlateWhitelistedUrl = `${config.WHITELISTED}?plate=${report.plateName}`;
+
+  return utils.requestp({
+      uri: isPlateWhitelistedUrl,
+      method: 'GET',
+      headers,
+      json: true
+    }).then(isWhitelistedResponse => {
+      let searchEntries, isWhitelisted;
+
+      searchEntries = isWhitelistedResponse.body;
+      isWhitelisted = Boolean(searchEntries.length);
+
+      return isWhitelisted
+        ? Promise.reject({error: 'plateIsWhitelisted'})
+        : Promise.resolve(report);
+    });
 }
 
 start();

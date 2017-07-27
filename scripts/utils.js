@@ -43,8 +43,8 @@ function createDir(path) {
 
 function createDirRecursive(dirpath) {
   var parts = dirpath.split(path.sep);
-  for( var i = 1; i <= parts.length; i++ ) {
-    createDir( path.join.apply(null, parts.slice(0, i)) );
+  for (var i = 1; i <= parts.length; i++) {
+    createDir(path.join.apply(null, parts.slice(0, i)));
   }
 }
 
