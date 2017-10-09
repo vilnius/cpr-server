@@ -1,9 +1,16 @@
 import * as mqtt from 'mqtt';
-import {piStatus} from './models';
+
+import { piStatus } from './models';
+import { MQTT_HOST, MQTT_PORT, MQTT_USERNAME, MQTT_PASSWORD } from '../config';
 
 export default function setupMqttListener() {
 
-  var client = mqtt.connect('mqtt://127.0.0.1:1883');
+  var client = mqtt.connect({
+      host: MQTT_HOST,
+      port: MQTT_PORT,
+      username: MQTT_USERNAME,
+      password: MQTT_PASSWORD
+  });
 
   var topicHandlers = {
 
