@@ -12,42 +12,23 @@ export default function setupMqttListener() {
       password: MQTT_PASSWORD
   });
 
-  var topicHandlers = {
+  function updatePiStatus(data) {
+    piStatus.findOneAndUpdate({ uid: data.uid }, data, { upsert: true }, (err, doc) => {
+      if (err) console.error('Error while trying to update pi status ->', err);
+    });
+  }
 
-    reg: (message) => {
-      var query;
-
-      message.connected = true;
-      query = { id: message.id };
-
-      piStatus.findOneAndUpdate(query, message, { upsert: true }, (err, doc) => {
-        if (err) console.error('error while trying to update connected pi status ->', err);
-        else console.log(doc);
-      });
-    },
-
-    unreg: (message) => {
-      var query;
-
-      message.connected = false;
-      query = { id: message.id };
-
-      piStatus.findOneAndUpdate(query, message, { upsert: false }, (err, doc) => {
-        if (err) console.error('error while trying to update disconnected pi status ->', err);
-        else console.log(doc);
-      });
-    }
-  };
+  var topics = ['cpr/+/heartbeat', 'cpr/+/connect', 'cpr/+/disconnect'];
 
   client.on('connect', () => {
-
-    Object.keys(topicHandlers).forEach((topicKey) => {
-      client.subscribe(topicKey);
+    topics.forEach((topic) => {
+      client.subscribe(topic);
     });
 
     client.on('message', (topic, message) => {
       message = JSON.parse(message);
-      topicHandlers[topic](message);
+      message.connected = topic.indexOf("/disconnect") === -1;
+      updatePiStatus(message);
     });
   });
 }

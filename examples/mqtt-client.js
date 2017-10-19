@@ -3,36 +3,51 @@ var mqtt = require('mqtt');
 var os = require('os');
 var dns = require('dns');
 
-var clientId = '003';
-var brokerUrl = 'mqtt://195.182.82.79:1883';
+var config = require('./config.js');
 
-var connOpts = {
+var uid = '00000003';
+
+var client = mqtt.connect({
+  host: config.MQTT_HOST,
+  port: config.MQTT_PORT,
+  username: config.MQTT_USERNAME,
+  password: config.MQTT_PASSWORD,
   will: {
-    topic: 'unreg',
-    payload: JSON.stringify({id: clientId})
+    topic: `cpr/${uid}/disconnect`,
+    payload: JSON.stringify({uid: uid})
   }
-};
+});
 
 var hostname = os.hostname();
-var client = mqtt.connect(brokerUrl, connOpts);
 
 dns.lookup(hostname, function (err, ipAddress) {
   if (err) throw err;
 
-  var message = {
-    id: clientId,
-    ip: ipAddress,
-    data: {
+  function sendHeartbeat() {
+    var message = {
+      uid: uid,
+      vpnIp: ipAddress,
+      version: '1.0.0',
       hostname: hostname,
-      uptime: os.uptime(),
-      totalmem: os.totalmem(),
       freemem: os.freemem(),
-      load: os.loadavg()
-    }
-  };
+      uptime: os.uptime(),
+      temp: '57.5',
+      gps: {
+        inPolygon: false,
+        hdop: 0.86,
+        satelites: 9
+      }
+    };
+    console.log("Sending message: ", message);
+    client.publish(`cpr/${uid}/heartbeat`, JSON.stringify(message));
+  }
 
   client.on('connect', function () {
-    console.log("Sending data: ", message);
-    client.publish('reg', JSON.stringify(message));
+    sendHeartbeat();
+    setTimeout(sendHeartbeat, 1000);
+    setTimeout(sendHeartbeat, 2000);
+    setTimeout(sendHeartbeat, 4000);
+    setTimeout(sendHeartbeat, 8000);
+    setTimeout(process.exit, 10000);
   });
 });

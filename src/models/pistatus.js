@@ -2,20 +2,23 @@ import mongoose from 'mongoose';
 var Schema = mongoose.Schema;
 
 var piStatus = new Schema({
-  id: {
+  uid: {
     type: String,
     required: true,
     trim: true
   },
-  ip: {
-    type: String,
-    required: true,
-    trim: true
+  vpnIp: String,
+  version: String,
+  hostname: String,
+  freemem: Number,
+  uptime: Number,
+  gps: {
+    satelites: Number,
+    hdop: Number,
+    inPolygon: Boolean
   },
-  connected: {
-    type: Boolean,
-    required: true
-  },
+  temp: String,
+  connected: Boolean
 }, {
   timestamps: true
 });
