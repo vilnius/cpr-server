@@ -18,7 +18,8 @@ var piStatus = new Schema({
     inPolygon: Boolean
   },
   temp: String,
-  connected: Boolean
+  connected: Boolean,
+  notes: String
 }, {
   timestamps: true
 });

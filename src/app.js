@@ -66,12 +66,12 @@ db((connection) => {
   app.use(middleware());
   // api router
   app.use('/api', api());
-  // serve index page and provide CSRF token
-  app.get('/', (req, res) => {
-    res.cookie('XSRF-TOKEN', req.csrfToken()).sendFile(path.join(config.STATIC_ROOT, 'index.html'));
-  });
   // serve static files
   app.use(express.static(config.STATIC_ROOT));
+  // serve index page and provide CSRF token
+  app.all('*', function(req, res) {
+    res.cookie('XSRF-TOKEN', req.csrfToken()).sendFile(path.join(config.STATIC_ROOT, 'index.html'));
+  });
 
   app.server.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0', () => {
     console.log(`Started on port ${app.server.address().address}:${app.server.address().port}`);
