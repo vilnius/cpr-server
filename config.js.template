@@ -13,4 +13,4 @@ export const MQTT_USERNAME = '';
 export const MQTT_PASSWORD = '';
 
 export const AUTH_SECRET = 'SECRET';
-export const AUTH_TOKEN_EXPIRESIN = 7*24*60*60;  // 7 days
+export const AUTH_TOKEN_EXPIRESIN = 3*24*60*60;  // 3 days

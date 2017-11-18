@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Types } from 'mongoose';
 
-import { isAuthenticated } from '../helpers';
+import { isAuthenticated } from '../auth';
 import { Shot } from '../models';
 import { PaginatedResponse } from './shared/pagination';
 

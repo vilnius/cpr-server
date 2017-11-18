@@ -10,6 +10,14 @@ import violations from './violations';
 
 import * as config from '../../config';
 
+const handleAuthError = (err, req, res, next) => {
+  if (err.name !== 'HttpError' || !err.errorCode) return next(err);
+  res.status(err.errorCode).json({
+    status: err.errorCode,
+    message: err.message
+  });
+};
+
 export default function() {
   var api = Router();
 
@@ -28,6 +36,7 @@ export default function() {
   api.use('/images', images());
   api.use('/pistatus', piStatus());
   api.use('/violations', violations());
+  api.use(handleAuthError);
 
   api.all('*', function(req, res) {
     res.status(404).json({

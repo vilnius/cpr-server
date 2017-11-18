@@ -6,7 +6,7 @@ import multer from 'multer';
 import { Router } from 'express';
 
 import { UPLOAD_PATH } from '../../config';
-import { isAuthenticated } from '../helpers';
+import { isAuthenticated } from '../auth';
 
 export default function() {
   var api = Router();

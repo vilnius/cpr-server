@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { isAuthenticated } from '../helpers';
+import { isAuthenticated } from '../auth';
 import { Lanemap } from '../models';
 
 export default function() {

@@ -5,12 +5,31 @@ import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 
 import * as config from '../config';
 import { User } from './models';
+import roles from './roles';
 
 const opts = {
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
   secretOrKey: config.AUTH_SECRET,
   expiresIn: config.AUTH_TOKEN_EXPIRESIN,
 };
+
+let acl;
+
+function createUser(username) {
+  // creates user if it does not exist, password is the same as username
+  User.findOne({ username: username }, (err, data) => {
+    if (err) throw err;
+    if (!data) {
+      User.register(new User({ username, name: username, email: username }), username, (err) => {
+        if (err) {
+          console.error('Error creating user!', err);
+        } else {
+          console.log(`Created new user ${username}`);
+        }
+      });
+    }
+  });
+}
 
 const makeSignedToken = (username) => {
   const payload = { username };
@@ -37,8 +56,8 @@ const refreshToken = (req, res) => {
   return res.json(makeSignedToken(req.user.username));
 }
 
-passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
-  User.findOne({username: jwt_payload.username}, (err, user) => {
+passport.use(new JwtStrategy(opts, (jwtPayload, done) => {
+  User.findOne({username: jwtPayload.username}, (err, user) => {
     if (err) {
       return done(err, false);
     }
@@ -50,13 +69,39 @@ passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
   });
 }));
 
+export const isAuthenticated = passport.authenticate('jwt', { session: false });
+
+const only = (role) => {
+  return [isAuthenticated, (req, res, next) => {
+    acl.hasRole(req.user.username, role).then((result) => {
+      if (result) {
+        return next();
+      }
+      res.status(403).send({ status: 403, error: 'Unauthorized' });
+    });
+  }]
+}
+
+function getUsername(req) {
+  return req.user.username;
+}
+
 export default {
-  initialize: () => {
+  initialize: (connection) => {
+    // new Acl(new Acl.mongodbBackend(connection.db, 'acl_'));
+    acl = new Acl(new Acl.memoryBackend());
+    acl.allow(roles);
+
+    createUser('admin');
+    acl.addUserRoles('admin', 'admin')
+
     return passport.initialize();
   },
-  isAuthenticated: () => {
-    return passport.authenticate('jwt', { session: false });
+  isAuthenticated: isAuthenticated,
+  hasAccess: (action) => {
+    return [isAuthenticated, acl.middleware(2, getUsername, action)]
   },
+  only,
   authenticate,
   refreshToken
 }

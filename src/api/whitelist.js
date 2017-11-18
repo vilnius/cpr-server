@@ -2,7 +2,8 @@ import { Router } from 'express';
 import multer from 'multer';
 import xlsx from 'xlsx';
 import Promise from 'promise';
-import { isAuthenticated } from '../helpers';
+
+import { isAuthenticated } from '../auth';
 import { WhitePlate } from '../models';
 
 export default function() {
