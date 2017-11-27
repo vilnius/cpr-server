@@ -7,6 +7,7 @@
     "start": "nodemon server.js",
     "lint": "eslint ./src",
     "mqtt-client": "node examples/mqtt-client.js",
+    "process": "cd scripts; node process.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

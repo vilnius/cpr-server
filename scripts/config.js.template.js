@@ -10,9 +10,10 @@ module.exports = {
   FILENAME: '1.png',
   USERNAME: 'admin',
   PASSWORD: 'admin',
-  LOGIN: URL + '/api/auth/login',
+  LOGIN: URL + '/api/tokens/login',
   IMAGES: URL + '/api/images',
   SHOTS: URL + '/api/shots',
+  WHITELISTED: URL + '/api/whitelist/search',
   URL : URL,
   OCRCOMMAND: 'docker run -i --rm -v $(pwd):/data:ro openalpr -j -c eu -p lt "'
 };

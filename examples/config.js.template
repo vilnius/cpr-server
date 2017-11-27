@@ -5,7 +5,7 @@ module.exports = {
     USERNAME: "admin",
     PASSWORD: "admin",
     URL : URL,
-    LOGIN: URL + "/api/auth/login",
+    LOGIN: URL + "/api/tokens/login",
     IMAGES: URL + "/api/images",
     SHOTS: URL + "/api/shots",
     MQTT_HOST: 'localhost',
