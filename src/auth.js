@@ -8,7 +8,7 @@ import { User } from './models';
 import roles from './roles';
 
 const opts = {
-  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
   secretOrKey: config.AUTH_SECRET,
   expiresIn: config.AUTH_TOKEN_EXPIRESIN,
 };
@@ -71,6 +71,10 @@ passport.use(new JwtStrategy(opts, (jwtPayload, done) => {
 
 export const isAuthenticated = passport.authenticate('jwt', { session: false });
 
+export const hasAccess = (action) => {
+  return [isAuthenticated, acl.middleware(2, getUsername, action)]
+}
+
 const only = (role) => {
   return [isAuthenticated, (req, res, next) => {
     acl.hasRole(req.user.username, role).then((result) => {
@@ -98,9 +102,7 @@ export default {
     return passport.initialize();
   },
   isAuthenticated: isAuthenticated,
-  hasAccess: (action) => {
-    return [isAuthenticated, acl.middleware(2, getUsername, action)]
-  },
+  hasAccess,
   only,
   authenticate,
   refreshToken

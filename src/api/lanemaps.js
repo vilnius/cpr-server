@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { isAuthenticated } from '../auth';
+import { hasAccess } from '../auth';
 import { Lanemap } from '../models';
 
 export default function() {
@@ -13,7 +13,7 @@ export default function() {
     });
   });
 
-  api.post('/', isAuthenticated, (req, res) => {
+  api.post('/', hasAccess(), (req, res) => {
     var lanemap = new Lanemap(req.body);
 
     lanemap.save((err, data) => {
@@ -44,7 +44,7 @@ export default function() {
 
   });
 
-  api.post('/:id', isAuthenticated, (req, res) => {
+  api.post('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     Lanemap.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {

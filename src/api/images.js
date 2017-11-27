@@ -6,7 +6,7 @@ import multer from 'multer';
 import { Router } from 'express';
 
 import { UPLOAD_PATH } from '../../config';
-import { isAuthenticated } from '../auth';
+import { hasAccess } from '../auth';
 
 export default function() {
   var api = Router();
@@ -22,13 +22,13 @@ export default function() {
   });
   var uploader = multer({ storage: storage });
 
-  api.post('/', isAuthenticated, uploader.single('image'), (req, res) => {
+  api.post('/', hasAccess(), uploader.single('image'), (req, res) => {
     console.log('File uploaded:', req.file);
     res.status(201).json(req.file);
   });
 
-  api.get('/:id', isAuthenticated, (req, res) => {
-    if (req.params.id !== path.normalize(req.params.id)) {
+  api.get('/:id', (req, res) => {
+    if (req.params.id !== path.normalize(req.params.id).replace(/^(\.\.[\/\\])+/, '')) {
       res.status(400).json({ error: 'Bad file ID' });
     }
 

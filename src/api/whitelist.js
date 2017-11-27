@@ -3,21 +3,21 @@ import multer from 'multer';
 import xlsx from 'xlsx';
 import Promise from 'promise';
 
-import { isAuthenticated } from '../auth';
+import { hasAccess } from '../auth';
 import { WhitePlate } from '../models';
 
 export default function() {
   var api = Router();
   var uploader = multer();
 
-  api.get('/', isAuthenticated, (req, res) => {
+  api.get('/', hasAccess(), (req, res) => {
     WhitePlate.find({}, (err, data) => {
       if (err) throw err;
       res.json(data);
     });
   });
 
-  api.post('/upload', isAuthenticated, uploader.single('uploads'), (req, res) => {
+  api.post('/upload', hasAccess(), uploader.single('uploads'), (req, res) => {
     var workbook = xlsx.read(toByteString(req.file), {type:'binary'});
     var worksheet = workbook.Sheets[workbook.SheetNames[0]];
     //get number of rows
@@ -55,7 +55,7 @@ export default function() {
       });
   });
 
-  api.post('/', isAuthenticated, (req, res) => {
+  api.post('/', hasAccess(), (req, res) => {
     var whiteplate = new WhitePlate(req.body);
 
     whiteplate.save((err, data) => {
@@ -67,7 +67,7 @@ export default function() {
   });
 
  //get white plate by vehicle number
-  api.get('/search', isAuthenticated, (req, res) => {
+  api.get('/search', hasAccess(), (req, res) => {
     var number = req.query.plate;
 
     WhitePlate.find({plate: number}, (err, data) => {
@@ -79,7 +79,7 @@ export default function() {
 
   });
 
-  api.get('/:id', isAuthenticated, (req, res) => {
+  api.get('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     WhitePlate.findById(id, (err, data) => {
@@ -94,7 +94,7 @@ export default function() {
 
   });
 
-  api.post('/:id', isAuthenticated, (req, res) => {
+  api.post('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     WhitePlate.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {
@@ -109,7 +109,7 @@ export default function() {
 
   });
 
-  api.delete('/:id', isAuthenticated, (req, res) => {
+  api.delete('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     WhitePlate.findByIdAndRemove(id, (err, data) => {

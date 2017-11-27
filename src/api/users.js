@@ -1,19 +1,19 @@
 import { Router } from 'express';
 
 import { User } from '../models';
-import auth from '../auth';
+import { hasAccess } from '../auth';
 
 export default function() {
   var api = Router();
 
-  api.get('/', auth.hasAccess(), (req, res) => {
+  api.get('/', hasAccess(), (req, res) => {
     User.find({}, (err, user) => {
       if (err) throw err;
       res.json(user);
     });
   });
 
-  api.post('/', auth.hasAccess(), (req, res) => {
+  api.post('/', hasAccess(), (req, res) => {
     var {username, password} = req.body;
 
     User.register(new User(req.body), password, (err) => {
@@ -24,7 +24,7 @@ export default function() {
     });
   });
 
-  api.get('/:id', auth.hasAccess(), (req, res) => {
+  api.get('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     User.findById(id, (err, user) => {
@@ -36,7 +36,7 @@ export default function() {
     });
   });
 
-  api.post('/:id', auth.isAuthenticated, (req, res) => {
+  api.post('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
     if (id !== req.user._id) {
       return res.status(404).json({status: 404, message: `Not found: ${id}`});
