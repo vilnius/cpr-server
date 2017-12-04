@@ -1,8 +1,14 @@
+const ADMIN = 'admin';
+const READONLY = 'readonly';
+
+export const ROLES = [ADMIN, READONLY]
+
 export default [
   {
-    roles: ['admin'],
+    roles: [ADMIN],
     allows: [
       { resources: '/api/users', permissions: '*' },
+      { resources: '/api/roles', permissions: '*' },
       { resources: '/api/lanemaps', permissions: '*' },
       { resources: '/api/shots', permissions: '*' },
       { resources: '/api/whitelist', permissions: '*' },
@@ -11,7 +17,7 @@ export default [
     ]
   },
   {
-    roles: ['readonly'],
+    roles: [READONLY],
     allows: [
       { resources: '/api/lanemaps', permissions: ['get'] },
       { resources: '/api/shots', permissions: ['get'] },

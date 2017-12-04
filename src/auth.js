@@ -13,7 +13,7 @@ const opts = {
   expiresIn: config.AUTH_TOKEN_EXPIRESIN,
 };
 
-let acl;
+export let acl;
 
 function createUser(username) {
   // creates user if it does not exist, password is the same as username
@@ -92,8 +92,8 @@ function getUsername(req) {
 
 export default {
   initialize: (connection) => {
-    // new Acl(new Acl.mongodbBackend(connection.db, 'acl_'));
-    acl = new Acl(new Acl.memoryBackend());
+    // new Acl(new Acl.memoryBackend());
+    acl = new Acl(new Acl.mongodbBackend(connection.db, 'acl_'));
     acl.allow(roles);
 
     createUser('admin');

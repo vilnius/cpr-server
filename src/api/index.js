@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import lanemaps from './lanemaps';
 import users from './users';
+import roles from './roles';
 import tokens from './tokens';
 import shots from './shots';
 import whitelist from './whitelist';
@@ -30,6 +31,7 @@ export default function() {
 
   api.use('/tokens', tokens());
   api.use('/users', users());
+  api.use('/roles', roles());
   api.use('/lanemaps', lanemaps());
   api.use('/shots', shots());
   api.use('/whitelist', whitelist());
