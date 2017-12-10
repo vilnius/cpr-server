@@ -61,18 +61,15 @@ docker run -ti -p 1883:1883 -p 9001:9001 toke/mosquitto
 
 All cpr-server API endpoints start with `/api`.
 
-### `/auth`
-Authentication is session based so far. You can get your session set by posting username/password to `/api/auth/login`.
-
-```
-GET / - read `XSRF-TOKEN` cookie and pass it to next requests as `x-xsrf-token`
-POST /api/auth/login {"username": "admin", "password": "admin" } - sets user session cookie
-POST /api/auth/logout
-GET /api/auth/me - get current user information
-```
+### `/tokens`
+Authentication is done using [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token). You can get your token by posting username/password to `/api/tokens/login`. It is valid for 3 days by default, to refresh a token, send a POST to `/api/tokens/refresh`.
 
 ### `/users`
-Basic CRUD using endpoint `/api/users`.
+Basic CRUD using endpoint `/api/users`. Requires `admin` role.
+
+### `/roles`
+Modifying roles requires `admin` role. To assign user a role, POST to `/roles/<rolename>` with `{ username: "<username>" }`.
+To remove role from a user, send a DELETE to `/roles/<rolename>` with the same JSON.
 
 ### `/lanemaps`
 
