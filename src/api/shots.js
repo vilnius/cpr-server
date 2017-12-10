@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { hasAccess } from '../auth';
 import { Shot } from '../models';
 import { PaginatedResponse } from './shared/pagination';
+import { deleteFiles } from './images';
 
 export default function() {
   var api = Router();
@@ -14,11 +15,15 @@ export default function() {
 
   api.delete('/', hasAccess(), (req, res) => {
     var ids = req.body.ids.map(id => Types.ObjectId(id));
-    Shot.remove({ '_id': { $in: ids } }, (err, data) => {
-      if (err) {
-        return res.status(400).json({ error: err.toString() });
-      }
-      res.json({ message: `${ids.length} shot(s) deleted` });
+    Shot.find({ '_id': { $in: ids } }, (err, shots) => {
+      ids = shots.map(shot => shot._id);
+      Shot.remove({ '_id': { $in: ids } }, (err) => {
+        if (err) {
+          return res.status(400).json({ error: err.toString() });
+        }
+        deleteFiles(shots.map(shot => shot.image));
+        res.json({ message: `${ids.length} shot(s) deleted` });
+      });
     });
   });
 
