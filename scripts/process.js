@@ -164,10 +164,7 @@ function checkFileIntegrity(imagePath) {
 
 function sendReport(reportObject) {
     var headers = {};
-    utils.requestp({ uri: config.URL })
-        .then(response => new Promise(resolve => utils.extractXsrfToken(response, resolve)))
-        .then(xsrftoken => headers['x-xsrf-token'] = xsrftoken)
-        .then(() => login(headers))
+    login().then(token => headers['Authorization'] = 'jwt ' + token)
         .then(() => isWhitelisted(reportObject, headers))
         .then(() => processFile(reportObject.localPath, headers, reportObject))
         .catch(err => {
@@ -217,8 +214,9 @@ function login(headers) {
         body: { username: config.USERNAME, password: config.PASSWORD},
         headers,
         json: true
-    }).then(() => {
+    }).then(data => {
         log('Login successful!');
+        return data.body.token;
     });
 }
 

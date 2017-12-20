@@ -33,16 +33,6 @@ function generateRandomShot(imageId) {
     };
 }
 
-function extractXsrfToken(response, callback) {
-    var cookies = response.headers['set-cookie'].join();
-    var match = /XSRF-TOKEN=(.*?);/i.exec(cookies);
-    if (match) {
-        callback(match[1]);
-    } else {
-        throw new Error('XSRF Token not found');
-    }
-}
-
 function login(headers) {
     return requestp({
         uri: config.LOGIN,
@@ -50,13 +40,14 @@ function login(headers) {
         body: { username: config.USERNAME, password: config.PASSWORD},
         headers,
         json: true
-    }).then(() => {
-        console.log('Login successful!');
-    });
+    }).then(data => data.body.token);
 }
 
-function processFile(filename, headers) {
+function processFile(filename, token) {
     console.log('Uploading', filename);
+    const headers = {
+        Authorization: 'jwt ' + token
+    };
     return requestp({
         uri: config.IMAGES,
         method: 'POST',
@@ -84,15 +75,8 @@ function createShot(imageId, headers) {
 //
 // Main application
 //
-// Get XSRF TOKEN ---> LOGIN ---> UPLOAD IMAGE ---> CREATE SHOT
-
-const headers = {};
+// LOGIN ---> UPLOAD IMAGE ---> CREATE SHOT
 
 console.log(`Start uploading ${config.FILENAME}...`);
 
-requestp({ uri: config.URL })
-    .then(response => new Promise(resolve => extractXsrfToken(response, resolve)))
-    .then(xsrftoken => headers['x-xsrf-token'] = xsrftoken)
-    .then(() => login(headers))
-    .then(() => processFile(config.FILENAME, headers))
-    .catch(err => console.error('Upload failed', err));
+login().then(token => processFile(config.FILENAME, token)).catch(err => console.error('Upload failed', err));

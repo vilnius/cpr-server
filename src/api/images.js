@@ -6,7 +6,29 @@ import multer from 'multer';
 import { Router } from 'express';
 
 import { UPLOAD_PATH } from '../../config';
-import { isAuthenticated } from '../helpers';
+import { hasAccess } from '../auth';
+
+function deleteFile(filename) {
+  var filePath = path.join(UPLOAD_PATH, filename);
+  return new Promise((resolve, reject) => {
+    if (fs.existsSync(filePath)) {
+      console.log(`Deleting ${filePath}`);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve();
+      });
+    } else {
+      // return OK even if file doesn't exist
+      return resolve();
+    }
+  })
+}
+
+export function deleteFiles(filenames) {
+  return Promise.all(filenames.map(deleteFile));
+}
 
 export default function() {
   var api = Router();
@@ -22,13 +44,23 @@ export default function() {
   });
   var uploader = multer({ storage: storage });
 
-  api.post('/', isAuthenticated, uploader.single('image'), (req, res) => {
+  api.post('/', hasAccess(), uploader.single('image'), (req, res) => {
     console.log('File uploaded:', req.file);
     res.status(201).json(req.file);
   });
 
-  api.get('/:id', isAuthenticated, (req, res) => {
-    if (req.params.id !== path.normalize(req.params.id)) {
+  api.delete('/:id', hasAccess(), (req, res) => {
+    if (req.params.id !== path.normalize(req.params.id).replace(/^(\.\.[\/\\])+/, '')) {
+      res.status(400).json({ error: 'Bad file ID' });
+    }
+    deleteFile(req.params.id).then(
+      () => res.json({ message: `${req.params.id} no longer exists` }),
+      (error) => res.status(400).json({ error })
+    );
+  });
+
+  api.get('/:id', /* NO AUTHORIZATION NEEDED */ (req, res) => {
+    if (req.params.id !== path.normalize(req.params.id).replace(/^(\.\.[\/\\])+/, '')) {
       res.status(400).json({ error: 'Bad file ID' });
     }
 

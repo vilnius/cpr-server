@@ -1,19 +1,19 @@
 import { Router } from 'express';
 
-import { isAuthenticated } from '../helpers';
 import { User } from '../models';
+import { hasAccess } from '../auth';
 
 export default function() {
   var api = Router();
 
-  api.get('/', isAuthenticated, (req, res) => {
+  api.get('/', hasAccess(), (req, res) => {
     User.find({}, (err, user) => {
       if (err) throw err;
       res.json(user);
     });
   });
 
-  api.post('/', isAuthenticated, (req, res) => {
+  api.post('/', hasAccess(), (req, res) => {
     var {username, password} = req.body;
 
     User.register(new User(req.body), password, (err) => {
@@ -24,7 +24,7 @@ export default function() {
     });
   });
 
-  api.get('/:id', isAuthenticated, (req, res) => {
+  api.get('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     User.findById(id, (err, user) => {
@@ -34,12 +34,13 @@ export default function() {
       }
       res.json(user);
     });
-
   });
 
-  api.post('/:id', isAuthenticated, (req, res) => {
-    // TODO: Passwords are not changed here
+  api.post('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
+    if (id !== req.user._id) {
+      return res.status(404).json({status: 404, message: `Not found: ${id}`});
+    }
 
     User.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, user) => {
       if (err) throw err;
@@ -57,7 +58,6 @@ export default function() {
         res.json(user);
       }
     });
-
   });
 
   return api;

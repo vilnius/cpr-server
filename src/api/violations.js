@@ -1,18 +1,18 @@
 import { Router } from 'express';
 import { Types } from 'mongoose';
 
-import { isAuthenticated } from '../helpers';
+import { hasAccess } from '../auth';
 import { Violation } from '../models';
 import { PaginatedResponse } from './shared/pagination';
 
 export default function() {
   var api = Router();
 
-  api.get('/', isAuthenticated, (req, res) => {
+  api.get('/', hasAccess(), (req, res) => {
     PaginatedResponse(req, res, Violation, { shotAt: -1 });
   });
 
-  api.delete('/', isAuthenticated, (req, res) => {
+  api.delete('/', hasAccess(), (req, res) => {
     var ids = req.body.ids.map(id => Types.ObjectId(id));
     Violation.remove({ '_id': { $in: ids } }, (err, data) => {
       if (err) {
@@ -22,7 +22,7 @@ export default function() {
     });
   });
 
-  api.post('/', isAuthenticated, (req, res) => {
+  api.post('/', hasAccess(), (req, res) => {
     var shot = new Violation(req.body);
 
     shot.save((err, data) => {
@@ -33,7 +33,7 @@ export default function() {
     });
   });
 
-  api.get('/:id', isAuthenticated, (req, res) => {
+  api.get('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     Violation.findById(id, (err, data) => {
@@ -48,7 +48,7 @@ export default function() {
 
   });
 
-  api.post('/:id', isAuthenticated, (req, res) => {
+  api.post('/:id', hasAccess(), (req, res) => {
     var id = req.params.id;
 
     Violation.findByIdAndUpdate(id, req.body, { runValidators: true, new: true }, (err, data) => {

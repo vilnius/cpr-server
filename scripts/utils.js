@@ -13,7 +13,6 @@ module.exports = {
   getImageEXIF       : getImageEXIF,
   moveProcessedImage : moveProcessedImage,
   requestp           : requestp,
-  extractXsrfToken   : extractXsrfToken
 };
 
 function execDeffered(command) {
@@ -99,15 +98,4 @@ function requestp(options) {
       resolve(res, body);
     });
   });
-}
-
-
-function extractXsrfToken(response, callback) {
-  var cookies = response.headers['set-cookie'].join();
-  var match = /XSRF-TOKEN=(.*?);/i.exec(cookies);
-  if (match) {
-    callback(match[1]);
-  } else {
-    throw new Error('XSRF Token not found');
-  }
 }
