@@ -14,8 +14,13 @@ export default function() {
   });
 
   api.delete('/', hasAccess(), (req, res) => {
-    var ids = req.body.ids.map(id => Types.ObjectId(id));
-    Shot.find({ '_id': { $in: ids } }, (err, shots) => {
+    var { ids, plate } = req.body;
+    if (!(ids || plate)) {
+      return res.status(400).json({ error: 'Bad parameters: missing ids or plate' });
+    }
+    ids = ids && ids.map(id => Types.ObjectId(id));
+    var query = ids ? { '_id': { $in: ids } } : { plate };
+    Shot.find(query, (err, shots) => {
       ids = shots.map(shot => shot._id);
       Shot.remove({ '_id': { $in: ids } }, (err) => {
         if (err) {
