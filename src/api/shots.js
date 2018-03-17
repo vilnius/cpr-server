@@ -14,7 +14,7 @@ export default function() {
   });
 
   api.delete('/', hasAccess(), (req, res) => {
-    var { ids, plate } = req.body;
+    var { ids, plate, deleteImages } = req.body;
     if (!(ids || plate)) {
       return res.status(400).json({ error: 'Bad parameters: missing ids or plate' });
     }
@@ -26,7 +26,9 @@ export default function() {
         if (err) {
           return res.status(400).json({ error: err.toString() });
         }
-        deleteFiles(shots.map(shot => shot.image));
+        if (deleteImages === true) {
+          deleteFiles(shots.map(shot => shot.image));
+        }
         res.json({ message: `${ids.length} shot(s) deleted` });
       });
     });
