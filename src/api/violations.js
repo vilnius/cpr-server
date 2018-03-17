@@ -2,8 +2,13 @@ import { Router } from 'express';
 import { Types } from 'mongoose';
 
 import { hasAccess } from '../auth';
-import { Violation } from '../models';
+import { submitPoliceReport } from '../integrations/police';
+import { Violation, ViolationStatus } from '../models';
 import { PaginatedResponse } from './shared/pagination';
+
+const ACTIONS = {
+  SUBMIT_POLICE_REPORT: 'SUBMIT_POLICE_REPORT',
+};
 
 export default function() {
   var api = Router();
@@ -14,7 +19,7 @@ export default function() {
 
   api.delete('/', hasAccess(), (req, res) => {
     var ids = req.body.ids.map(id => Types.ObjectId(id));
-    Violation.remove({ '_id': { $in: ids } }, (err, data) => {
+    Violation.remove({ '_id': { $in: ids } }, (err) => {
       if (err) {
         return res.status(400).json({ error: err.toString() });
       }
@@ -61,6 +66,34 @@ export default function() {
       res.json(data);
     });
 
+  });
+
+  api.put('/:id', hasAccess(), (req, res) => {
+    var id = req.params.id;
+    var action = req.query.action;
+
+    if (!Object.keys(ACTIONS).includes(action)) {
+      return res.status(400).json({ error: `Unknown action: ${action}` });
+    }
+
+    Violation.findOne({ _id: id}, (err, violation) => {
+      if (err) {
+        return res.status(404).json({status: 404, message: `Not found: ${id}`});
+      }
+      if (action === ACTIONS.SUBMIT_POLICE_REPORT) {
+        submitPoliceReport(violation).then(() => {
+          violation.status = ViolationStatus.SENT;
+          violation.save((err, data) => {
+            if (err) {
+              return res.status(400).json({ error: err.toString() });
+            }
+            res.json(data);
+          });
+        }).catch((err) => {
+          return res.status(400).json({ error: err.toString() });
+        });
+      }
+    });
   });
 
   return api;

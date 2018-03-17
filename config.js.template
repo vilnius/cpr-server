@@ -14,3 +14,7 @@ export const MQTT_PASSWORD = '';
 
 export const AUTH_SECRET = 'SECRET';
 export const AUTH_TOKEN_EXPIRESIN = 3*24*60*60;  // 3 days
+
+export const PUBLIC_CERT = path.join(__dirname, 'certs', 'cprpub.pem');
+export const PRIVATE_KEY = path.join(__dirname, 'certs', 'cprkey.pem');
+export const PRIVATE_KEY_SECRET = 'magic';

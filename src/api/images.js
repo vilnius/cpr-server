@@ -23,7 +23,7 @@ function deleteFile(filename) {
       // return OK even if file doesn't exist
       return resolve();
     }
-  })
+  });
 }
 
 export function deleteFiles(filenames) {
@@ -68,7 +68,7 @@ export default function() {
     try {
       var stat = fs.statSync(filePath);
     } catch(e) {
-      res.status(404).json({ error: 'File not found' });
+      return res.status(404).json({ error: 'File not found' });
     }
     res.writeHead(200, {
       'Content-Type': mime.lookup(filePath),
