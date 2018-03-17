@@ -7,6 +7,9 @@ logs
 *.log
 npm-debug.log*
 
+# Editors stuff
+.vscode
+
 # Runtime data
 pids
 *.pid
@@ -47,3 +50,6 @@ jspm_packages
 # Uploadable files
 scripts/incoming
 scripts/processed
+
+# private test image files
+scripts/test.private.*
