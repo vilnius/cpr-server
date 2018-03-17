@@ -15,5 +15,5 @@ module.exports = {
   SHOTS: URL + '/api/shots',
   WHITELISTED: URL + '/api/whitelist/search',
   URL : URL,
-  OCRCOMMAND: 'docker run -i --rm -v $(pwd):/data:ro openalpr -j -c eu -p lt "'
+  OCRCOMMAND: 'docker run -i --rm -v $(pwd):/data:ro openalpr -j -c eu -p lt --config /data/custom-alpr-config/openalpr.conf "'
 };
